@@ -11,6 +11,9 @@ import (
 var _ = fmt.Print
 
 func main() {
+
+	builtins := []string{"echo", "exit", "type"}
+
 	for {
 		fmt.Print("$ ")
 		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
@@ -31,6 +34,24 @@ func main() {
             continue
         }
 
+		if strings.HasPrefix(command, "type ") {
+			args := strings.TrimSpace(command[5:])
+			// Check if it's a builtin command
+			isBuiltin := false
+			for _, builtin := range builtins {
+				if args == builtin {
+					isBuiltin = true
+					break
+				}
+			}
+
+			if isBuiltin {
+				fmt.Printf("%s is a shell builtin\n", args)
+			} else {
+				fmt.Printf("%s: not found\n", args)
+			}
+			continue
+		}
 
 		fmt.Println(command + ": command not found")
 
