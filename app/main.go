@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -29,10 +30,10 @@ func main() {
 		}
 
 		if strings.HasPrefix(command, "echo ") {
-            args := command[5:]
-            fmt.Println(args)
-            continue
-        }
+			args := command[5:]
+			fmt.Println(args)
+			continue
+		}
 
 		if strings.HasPrefix(command, "type ") {
 			args := strings.TrimSpace(command[5:])
@@ -45,12 +46,43 @@ func main() {
 				}
 			}
 
-			if isBuiltin {
-				fmt.Printf("%s is a shell builtin\n", args)
-			} else {
-				fmt.Printf("%s: not found\n", args)
-			}
-			continue
+            if isBuiltin {
+                fmt.Printf("%s is a shell builtin\n", args)
+                continue
+            }
+
+			pathEnv := os.Getenv("PATH")
+            pathDirs := strings.Split(pathEnv, string(os.PathListSeparator))
+            
+            found := false
+            for _, dir := range pathDirs {
+                fullPath := filepath.Join(dir, args)
+                
+                // Check if file exists
+                fileInfo, err := os.Stat(fullPath)
+                if err != nil {
+                    continue 
+                }
+                
+                // not a directory
+                if !fileInfo.Mode().IsRegular() {
+                    continue
+                }
+                
+                // Check execute permissions
+                if fileInfo.Mode()&0111 != 0 {
+                    fmt.Printf("%s is %s\n", args, fullPath)
+                    found = true
+                    break
+                }
+            }
+
+            if !found {
+                fmt.Printf("%s: not found\n", args)
+            }
+            continue
+
+
 		}
 
 		fmt.Println(command + ": command not found")
