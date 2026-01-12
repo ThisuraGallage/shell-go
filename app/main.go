@@ -17,6 +17,13 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error reading input: %v\n", err)
 			return
 		}
+
+		command = strings.TrimSpace(command)
+        
+        if command == "exit" {
+            return
+        }
+
 		fmt.Println(command[:len(command)-1] + ": command not found")
 	}
 }
