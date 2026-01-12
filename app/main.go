@@ -37,7 +37,7 @@ func main() {
 
 		if strings.HasPrefix(command, "type ") {
 			args := strings.TrimSpace(command[5:])
-			// Check if it's a builtin command
+
 			isBuiltin := false
 			for _, builtin := range builtins {
 				if args == builtin {
