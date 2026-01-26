@@ -103,43 +103,17 @@ func main() {
 		}
 
 		if !isBuiltin {
-			// Search for executable in PATH
-			pathEnv := os.Getenv("PATH")
-			pathDirs := strings.Split(pathEnv, string(os.PathListSeparator))
+			// Use exec.Command directly with cmdName - it will search PATH automatically
+			cmd := exec.Command(cmdName, cmdArgs...)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			cmd.Stdin = os.Stdin
 
-			execPath := ""
-			for _, dir := range pathDirs {
-				fullPath := filepath.Join(dir, cmdName)
-
-				fileInfo, err := os.Stat(fullPath)
-				if err != nil {
-					continue
-				}
-
-				if !fileInfo.Mode().IsRegular() {
-					continue
-				}
-
-				if fileInfo.Mode()&0111 != 0 {
-					execPath = fullPath
-					break
-				}
+			err := cmd.Run()
+			if err != nil {
+				fmt.Println(command + ": command not found")
 			}
-
-			if execPath != "" {
-				// Execute the program
-				allArgs := append([]string{cmdName}, cmdArgs...)
-				cmd := exec.Command(execPath, allArgs...)
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = os.Stderr
-				cmd.Stdin = os.Stdin
-
-				err := cmd.Run()
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error executing command: %v\n", err)
-				}
-				continue
-			}
+			continue
 		}
 
 		fmt.Println(command + ": command not found")
