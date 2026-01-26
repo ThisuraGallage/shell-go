@@ -128,7 +128,8 @@ func main() {
 
 			if execPath != "" {
 				// Execute the program
-				cmd := exec.Command(execPath, cmdArgs...)
+				allArgs := append([]string{cmdName}, cmdArgs...)
+				cmd := exec.Command(execPath, allArgs...)
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 				cmd.Stdin = os.Stdin
