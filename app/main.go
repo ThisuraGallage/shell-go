@@ -14,7 +14,7 @@ var _ = fmt.Print
 
 func main() {
 
-	builtins := []string{"echo", "exit", "type"}
+	builtins := []string{"echo", "exit", "type", "pwd"}
 
 	for {
 		fmt.Print("$ ")
@@ -28,6 +28,16 @@ func main() {
 
 		if command == "exit" {
 			return
+		}
+
+		if command == "pwd" {
+			dir, err := os.Getwd()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error getting current directory: %v\n", err)
+			} else {
+				fmt.Println(dir)
+			}
+			continue
 		}
 
 		if strings.HasPrefix(command, "echo ") {
